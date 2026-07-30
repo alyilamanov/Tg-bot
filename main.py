@@ -28,9 +28,30 @@ BOT_TOKEN = os.getenv("BOT_TOKEN", "BOTFATHER_TOKENI")
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+# YANGI KOD:
 @dp.message(CommandStart())
 async def start_cmd(message: types.Message):
-    await message.answer("Assalomu alaykum! Menga TikTok video havolasini yuboring. 🎵")
+    # Tugmalarni sozlash (xohlasangiz linklarni o'zingiznikiga almashtiring)
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="📢 Kanalimiz", url="https://t.me/telegram"),
+                InlineKeyboardButton(text="👨‍💻 Dasturchi", url="https://t.me/telegram")
+            ]
+        ]
+    )
+
+    welcome_text = (
+        f"👋 <b>Assalomu alaykum, {message.from_user.first_name}!</b>\n\n"
+        f"🤖 Men **TikTok Video Downloader** botiman.\n\n"
+        f"📥 Menga TikTok video havolasini (linkini) yuboring, "
+        f"men uni suv belgisiz (watermark'siz) yuklab beraman!\n\n"
+        f"👇 Boshlash uchun shunchaki link yuboring."
+    )
+
+    await message.answer(welcome_text, parse_mode="HTML", reply_markup=keyboard)
 
 @dp.message(F.text)
 async def handle_messages(message: types.Message):
