@@ -37,8 +37,8 @@ async def start_cmd(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="📢 Kanalimiz", url="https://t.me/telegram"),
-                InlineKeyboardButton(text="👨‍💻 Dasturchi", url="https://t.me/telegram")
+                InlineKeyboardButton(text="📢 Kanalimiz", url="https://t.me/internet_hyzmatlary_owrenmek"),
+                InlineKeyboardButton(text="👨‍💻 Dasturchi", url="https://t.me/Ali_240998")
             ]
         ]
     )
