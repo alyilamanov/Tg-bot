@@ -4,21 +4,23 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from yt_dlp import YoutubeDL
 
+# Tokeningiz
 BOT_TOKEN = os.getenv("BOT_TOKEN", "8889561169:AAEu2ZkdFoGXju86YTRjN_9DVjMGAiCmXKQ")
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
+# /start buyrug'i uchun
 @dp.message(CommandStart())
 async def start_cmd(message: types.Message):
-    await message.answer("Assalomu alaykum! Menga YouTube (Shorts) yoki TikTok video havolasini yuboring.")
+    await message.answer("Assalomu alaykum! Menga faqat TikTok video havolasini (link) yuboring, men uni sizga yuklab beraman. 🎵")
 
-@dp.message(F.text.contains("tiktok.com") | F.text.contains("youtube.com") | F.text.contains("youtu.be"))
-async def download_video(message: types.Message):
+# Faqat TikTok linklarini qabul qilish
+@dp.message(F.text.contains("tiktok.com"))
+async def download_tiktok_video(message: types.Message):
     url = message.text.strip()
-    status_msg = await message.answer("Video qidirilmoqda va yuklanmoqda, kuting...")
+    status_msg = await message.answer("TikTok videosi yuklanmoqda, kuting... ⏳")
 
-    # FFmpeg talab qilmaydigan eng sodda va tayyor MP4 formatni tanlaymiz
     ydl_opts = {
         'format': 'b[ext=mp4]/best[ext=mp4]/best',
         'outtmpl': 'downloads/%(id)s.%(ext)s',
@@ -27,39 +29,19 @@ async def download_video(message: types.Message):
     }
 
     try:
-        # downloads papkasi bo'lmasa yaratib oladi
         if not os.path.exists('downloads'):
             os.makedirs('downloads')
 
         with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             filename = ydl.prepare_filename(info)
-            title = info.get('title', 'Video')
+            title = info.get('title', 'TikTok Video')
 
-        await status_msg.edit_text("Video yuklab olindi, Telegram'ga yuborilmoqda...")
-
-        video_file = types.FSInputFile(filename)
-        await message.answer_video(video=video_file, caption=f"🎬 <b>{title}</b>", parse_mode="HTML")
-
-        if os.path.exists(filename):
-            os.remove(filename)
-            
-        await status_msg.delete()
-
-    except Exception as e:
-        print(f"Xatolik: {e}") # Render logida aniq xatoni ko'rish uchun
-        await status_msg.edit_text(f"Videoni yuklab olishda xatolik yuz berdi.\n\nEslatma: Juda katta hajmli videolarni yuklab bo'lmasligi mumkin.")
-
-async def main():
-    await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    asyncio.run(main())
-
-        await status_msg.edit_text("Video yuklab olindi, Telegram'ga yuborilmoqda...")
+        await status_msg.edit_text("Video tayyor, Telegram'ga yuborilmoqda... 🚀")
 
         video_file = types.FSInputFile(filename)
-        await message.answer_video(video=video_file, caption=f"🎬 <b>{title}</b>", parse_mode="HTML")
+        # Videoni yuborish
+        await message.answer_video(video=video_file, caption=f"🎵 <b>{title}</b>", parse_mode="HTML")
 
         # Xotirani tozalash
         if os.path.exists(filename):
@@ -68,9 +50,14 @@ if __name__ == "__main__":
         await status_msg.delete()
 
     except Exception as e:
-        await status_msg.edit_text("Videoni yuklab olishda xatolik yuz berdi. Linkni tekshirib qaytadan urinib ko'ring.")
+        print(f"Xatolik: {e}")
+        await status_msg.edit_text("❌ Videoni yuklab olishda xatolik yuz berdi.\nLink to'g'riligini yoki video yopiq (private) emasligini tekshiring.")
 
-# Botni ishga tushirish qismi
+# Agar TikTok bo'lmagan boshqa link yoki oddiy so'z yuborilsa
+@dp.message()
+async def handle_other_messages(message: types.Message):
+    await message.answer("⚠️ Iltimos, menga faqat TikTok videosining havolasini yuboring!\n(Masalan: https://vm.tiktok.com/...)")
+
 async def main():
     await dp.start_polling(bot)
 
